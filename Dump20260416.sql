@@ -29,6 +29,8 @@ CREATE TABLE `booking_assignments` (
   `booking_id` int DEFAULT NULL,
   `driver_id` int DEFAULT NULL,
   `vehicle_id` int DEFAULT NULL,
+  `start_time` datetime DEFAULT NULL,
+  `end_time` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `booking_id` (`booking_id`),
   KEY `driver_id` (`driver_id`),
@@ -45,7 +47,7 @@ CREATE TABLE `booking_assignments` (
 
 LOCK TABLES `booking_assignments` WRITE;
 /*!40000 ALTER TABLE `booking_assignments` DISABLE KEYS */;
-INSERT INTO `booking_assignments` VALUES (1,1,1,1),(2,4,2,2);
+INSERT INTO `booking_assignments` VALUES (1,1,1,1,NULL,NULL),(2,4,2,2,NULL,NULL);
 /*!40000 ALTER TABLE `booking_assignments` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -349,7 +351,10 @@ CREATE TABLE `drivers` (
   `license_number` varchar(100) DEFAULT NULL,
   `office_location` enum('Tokyo','Osaka','Nagoya','Sapporo') NOT NULL,
   `is_available` tinyint(1) DEFAULT '1',
-  PRIMARY KEY (`id`)
+  `office_id` int DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `fk_driver_office` (`office_id`),
+  CONSTRAINT `fk_driver_office` FOREIGN KEY (`office_id`) REFERENCES `offices` (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -359,7 +364,7 @@ CREATE TABLE `drivers` (
 
 LOCK TABLES `drivers` WRITE;
 /*!40000 ALTER TABLE `drivers` DISABLE KEYS */;
-INSERT INTO `drivers` VALUES (1,'Taro Yamada','09011112222','LIC123','Tokyo',1),(2,'Ken Suzuki','09033334444','LIC456','Tokyo',1),(3,'S. Tanaka','090-1111-0001','LIC-T01','Tokyo',1),(4,'K. Sato','090-1111-0002','LIC-T02','Tokyo',1),(5,'I. Suzuki','090-1111-0003','LIC-T03','Tokyo',1),(6,'M. Takahashi','090-1111-0004','LIC-T04','Tokyo',1),(7,'Y. Watanabe','090-1111-0005','LIC-T05','Tokyo',1),(8,'H. Ito','090-1111-0006','LIC-T06','Tokyo',1),(9,'R. Yamamoto','090-1111-0007','LIC-T07','Tokyo',1),(10,'N. Nakamura','090-1111-0008','LIC-T08','Tokyo',1),(11,'T. Kobayashi','090-1111-0009','LIC-T09','Tokyo',1),(12,'A. Kato','090-1111-0010','LIC-T10','Tokyo',1);
+INSERT INTO `drivers` VALUES (1,'Taro Yamada','09011112222','LIC123','Tokyo',1,1),(2,'Ken Suzuki','09033334444','LIC456','Tokyo',1,1),(3,'S. Tanaka','090-1111-0001','LIC-T01','Tokyo',1,1),(4,'K. Sato','090-1111-0002','LIC-T02','Tokyo',1,1),(5,'I. Suzuki','090-1111-0003','LIC-T03','Tokyo',1,1),(6,'M. Takahashi','090-1111-0004','LIC-T04','Tokyo',1,1),(7,'Y. Watanabe','090-1111-0005','LIC-T05','Tokyo',1,1),(8,'H. Ito','090-1111-0006','LIC-T06','Tokyo',1,1),(9,'R. Yamamoto','090-1111-0007','LIC-T07','Tokyo',1,1),(10,'N. Nakamura','090-1111-0008','LIC-T08','Tokyo',1,1),(11,'T. Kobayashi','090-1111-0009','LIC-T09','Tokyo',1,1),(12,'A. Kato','090-1111-0010','LIC-T10','Tokyo',1,1);
 /*!40000 ALTER TABLE `drivers` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -375,13 +380,11 @@ CREATE TABLE `fleet_models` (
   `category_name` varchar(100) DEFAULT NULL,
   `model_name` varchar(100) DEFAULT NULL,
   `vehicle_class` enum('SEDAN','SUV','VAN','BUS') DEFAULT NULL,
-  `owner_type` enum('Self-Owned','Partner') DEFAULT 'Self-Owned',
-  `long_mileage_fee_jpy` int DEFAULT '0',
-  `overtime_fee_jpy` int DEFAULT '0',
-  `overtime_unit_minutes` int DEFAULT '30',
-  `base_capacity` int DEFAULT NULL,
+  `owner_type` enum('Self-Owned','Partner') DEFAULT NULL,
+  `long_mileage_fee_jpy` int DEFAULT NULL,
+  `overtime_fee_jpy` int DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -390,7 +393,6 @@ CREATE TABLE `fleet_models` (
 
 LOCK TABLES `fleet_models` WRITE;
 /*!40000 ALTER TABLE `fleet_models` DISABLE KEYS */;
-INSERT INTO `fleet_models` VALUES (1,'Premium Minivan','Toyota Alphard 30Gen','VAN','Self-Owned',140,4000,30,6),(2,'Luxury Sedan','Benz S Class','SEDAN','Partner',150,5500,30,4),(3,'Crossover EV','Tesla Model Y','SUV','Self-Owned',100,3500,30,4),(4,'Commuter Van','Hiace Commuter','VAN','Self-Owned',150,4000,30,10);
 /*!40000 ALTER TABLE `fleet_models` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -416,6 +418,33 @@ CREATE TABLE `fleet_office_availability` (
 LOCK TABLES `fleet_office_availability` WRITE;
 /*!40000 ALTER TABLE `fleet_office_availability` DISABLE KEYS */;
 /*!40000 ALTER TABLE `fleet_office_availability` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `offices`
+--
+
+DROP TABLE IF EXISTS `offices`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `offices` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(100) NOT NULL,
+  `address` text,
+  `max_radius` varchar(50) DEFAULT NULL,
+  `radius_type` enum('kilometers','region') DEFAULT 'kilometers',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `offices`
+--
+
+LOCK TABLES `offices` WRITE;
+/*!40000 ALTER TABLE `offices` DISABLE KEYS */;
+INSERT INTO `offices` VALUES (1,'Tokyo Office','1-1-1, Chuo-ku, Tokyo','400','kilometers'),(2,'Osaka Office','4 Chome-1-6 Senbachuo, Chuo Ward, Osaka, 541-0055','400','kilometers'),(3,'Nagoya Office','3 Chome-5-12, Sakae, Naka Ward, Nagoya, Aichi','400','kilometers'),(4,'Sapporo Office','Hokkaido, Sapporo, Shiroishi Ward, Kawashimo, 2651-3','Hokkaido','region');
+/*!40000 ALTER TABLE `offices` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -566,18 +595,19 @@ DROP TABLE IF EXISTS `vehicles`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `vehicles` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `make` varchar(100) DEFAULT NULL,
-  `model` varchar(100) DEFAULT NULL,
+  `fleet_id` int NOT NULL,
   `plate_number` varchar(50) DEFAULT NULL,
-  `capacity` int DEFAULT NULL,
-  `vehicle_class` enum('SEDAN','SUV','VAN','BUS') DEFAULT NULL,
-  `office_location` enum('Tokyo','Osaka','Nagoya','Sapporo') NOT NULL,
-  `owner_type` enum('Self-Owned','Partner') DEFAULT 'Self-Owned',
-  `long_mileage_fee_jpy` int DEFAULT '0',
-  `overtime_fee_jpy` int DEFAULT '0',
-  `overtime_unit_minutes` int DEFAULT '30',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  `vin` varchar(50) DEFAULT NULL,
+  `odometer_reading` int DEFAULT NULL,
+  `current_office` enum('Tokyo','Osaka','Nagoya','Sapporo') DEFAULT NULL,
+  `office_id` int DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `vin` (`vin`),
+  KEY `fk_vehicle_fleet` (`fleet_id`),
+  KEY `fk_vehicle_office` (`office_id`),
+  CONSTRAINT `fk_vehicle_fleet` FOREIGN KEY (`fleet_id`) REFERENCES `fleet_models` (`id`),
+  CONSTRAINT `fk_vehicle_office` FOREIGN KEY (`office_id`) REFERENCES `offices` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -586,7 +616,6 @@ CREATE TABLE `vehicles` (
 
 LOCK TABLES `vehicles` WRITE;
 /*!40000 ALTER TABLE `vehicles` DISABLE KEYS */;
-INSERT INTO `vehicles` VALUES (1,'Toyota','Camry','ABC-123',4,'SEDAN','Tokyo','Self-Owned',0,0,30),(2,'Honda','Odyssey','VAN-456',7,'VAN','Tokyo','Self-Owned',0,0,30),(3,'Mercedes','V-Class','LUX-789',6,'VAN','Tokyo','Self-Owned',0,0,30);
 /*!40000 ALTER TABLE `vehicles` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -617,4 +646,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-04-16 12:06:40
+-- Dump completed on 2026-04-16 17:49:04
