@@ -220,7 +220,7 @@ CREATE TABLE `change_requests` (
   `operator_note` text,
   `reviewed_by` int DEFAULT NULL,
   `price_difference` decimal(10,2) DEFAULT NULL,
-  `currency` varchar(10) DEFAULT NULL,
+  `currency` enum('JPY','USD','EUR','CNY','INR','GBP','AUD','CAD') NOT NULL DEFAULT 'JPY',
   `submitted_at` datetime DEFAULT NULL,
   `reviewed_at` datetime DEFAULT NULL,
   `resolved_at` datetime DEFAULT NULL,
@@ -488,10 +488,10 @@ CREATE TABLE `payments` (
   `change_request_id` int DEFAULT NULL,
   `sales_order_id` int DEFAULT NULL,
   `amount` decimal(10,2) DEFAULT NULL,
-  `currency` varchar(10) DEFAULT NULL,
+  `currency` enum('JPY','USD','EUR','CNY','INR','GBP','AUD','CAD') NOT NULL DEFAULT 'JPY',
   `type` enum('BOOKING_PAYMENT','CHANGE_ADDITIONAL_PAYMENT','REFUND') DEFAULT NULL,
   `status` enum('PENDING','SUCCEEDED','FAILED','REFUNDED') DEFAULT NULL,
-  `payment_method` varchar(50) DEFAULT NULL,
+  `payment_method` enum('OFFLINE','ONLINE') NOT NULL DEFAULT 'ONLINE',
   `stripe_payment_intent_id` varchar(255) DEFAULT NULL,
   `stripe_refund_id` varchar(255) DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
@@ -512,7 +512,7 @@ CREATE TABLE `payments` (
 
 LOCK TABLES `payments` WRITE;
 /*!40000 ALTER TABLE `payments` DISABLE KEYS */;
-INSERT INTO `payments` VALUES (1,1,NULL,1,25000.00,'JPY','BOOKING_PAYMENT','SUCCEEDED','CARD',NULL,NULL,'2026-04-13 07:28:57'),(2,3,NULL,2,20000.00,'JPY','BOOKING_PAYMENT','PENDING','CARD',NULL,NULL,'2026-04-13 07:28:57'),(3,4,NULL,3,40000.00,'JPY','BOOKING_PAYMENT','SUCCEEDED','CARD',NULL,NULL,'2026-04-13 07:28:57'),(4,NULL,1,NULL,10000.00,'JPY','CHANGE_ADDITIONAL_PAYMENT','PENDING','CARD',NULL,NULL,'2026-04-13 07:28:57'),(5,NULL,2,NULL,5000.00,'JPY','REFUND','SUCCEEDED','CARD',NULL,NULL,'2026-04-13 07:28:57');
+INSERT INTO `payments` VALUES (1,1,NULL,1,25000.00,'JPY','BOOKING_PAYMENT','SUCCEEDED','ONLINE',NULL,NULL,'2026-04-13 07:28:57'),(2,3,NULL,2,20000.00,'JPY','BOOKING_PAYMENT','PENDING','ONLINE',NULL,NULL,'2026-04-13 07:28:57'),(3,4,NULL,3,40000.00,'JPY','BOOKING_PAYMENT','SUCCEEDED','ONLINE',NULL,NULL,'2026-04-13 07:28:57'),(4,NULL,1,NULL,10000.00,'JPY','CHANGE_ADDITIONAL_PAYMENT','PENDING','ONLINE',NULL,NULL,'2026-04-13 07:28:57'),(5,NULL,2,NULL,5000.00,'JPY','REFUND','SUCCEEDED','ONLINE',NULL,NULL,'2026-04-13 07:28:57');
 /*!40000 ALTER TABLE `payments` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -529,7 +529,7 @@ CREATE TABLE `sales_orders` (
   `change_request_id` int DEFAULT NULL,
   `order_number` varchar(50) DEFAULT NULL,
   `amount` decimal(10,2) DEFAULT NULL,
-  `currency` varchar(10) DEFAULT NULL,
+  `currency` enum('JPY','USD','EUR','CNY','INR','GBP','AUD','CAD') NOT NULL DEFAULT 'JPY',
   `state` enum('DRAFT','FINALIZED','CANCELLED') DEFAULT NULL,
   `status` enum('PENDING','PAID','FAILED') DEFAULT NULL,
   `quotation_sent_at` datetime DEFAULT NULL,
@@ -648,4 +648,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-04-17 15:42:42
+-- Dump completed on 2026-04-27 17:31:20
